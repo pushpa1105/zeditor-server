@@ -5,25 +5,27 @@ import { commonValidations } from "@/common/utils/commonValidation";
 
 extendZodWithOpenApi(z);
 
-export type User = z.infer<typeof UserSchema>;
+export type User = z.infer<typeof User>;
 export type LoginUserData = z.infer<typeof LoginUserSchema.shape.body>;
 export type CreateUserData = z.infer<typeof CreateUserSchema.shape.body>;
 export type LoginReponse = z.infer<typeof LoginResponseSchema>
 
-export const UserSchema = z.object({
-	id: z.number(),
+export const UserRole = z.enum(["admin", "user"]);
+
+export const User = z.object({
+	_id: z.string(),
 	name: z.string(),
 	email: z.string().email(),
-	role: z.string().default('user'),
+	role: UserRole.default('user'),
 	password: z.string().min(6),
-	age: z.number(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
+	activeWorkspace: z.string().nullable()
 });
 
 export const LoginResponseSchema = z.object({
 	token: z.string(),
-	user: UserSchema
+	user: User
 })
 
 export const CreateUserSchema = z.object({

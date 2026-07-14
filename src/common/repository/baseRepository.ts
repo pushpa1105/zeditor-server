@@ -20,6 +20,10 @@ export abstract class BaseRepository<T> {
         return await this.model.insertOne(doc)
     }
 
+    async findAll() {
+        return await this.model.find({})
+    }
+
     async findById(id: string) {
         return await this.model.findOne({ _id: id })
     }

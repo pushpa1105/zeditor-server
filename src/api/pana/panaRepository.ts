@@ -1,10 +1,9 @@
-import { DeleteResult, Types } from "mongoose";
-import { PanaDocument, PanaModel } from "./panaModel";
-import { DocumentWithMetaData, WithPagination } from "@/common/schema";
+import { PanaModel } from "./panaModel";
 import { BaseRepository } from "@/common/repository/baseRepository";
 import { AsyncLocalStorageCurrentUser } from "@/common/context/requestContext";
+import { type Pana } from "@/api/pana/panaSchema";
 
-export class PanaRepository extends BaseRepository<PanaDocument> {
+export class PanaRepository extends BaseRepository<Pana> {
 
     constructor(model = PanaModel, currentUser = new AsyncLocalStorageCurrentUser()) {
         super(model, currentUser)
@@ -14,7 +13,7 @@ export class PanaRepository extends BaseRepository<PanaDocument> {
         const result = await this.model.aggregate([
             {
                 $match: {
-                    _id: new Types.ObjectId(id),
+                    _id: id,
                 },
             },
             {
@@ -47,31 +46,7 @@ export class PanaRepository extends BaseRepository<PanaDocument> {
         return result?.[0]?.allIds ?? [];
     }
 
-    async findWithPagination({
-        pagination,
-        filters
-    }: WithPagination): Promise<DocumentWithMetaData<PanaDocument[]>> {
-        const { skip, limit, sort } = pagination
-
-        const query = { ...filters }
-
-        const [data, total] = await Promise.all([
-            this.model.find(query)
-                .sort(sort)
-                .skip(skip)
-                .limit(limit),
-            this.model.countDocuments(query)
-        ])
-
-
-        return {
-            data,
-            meta: {
-                total,
-                page: pagination?.page ?? 1,
-                limit: limit ?? 10,
-                totalPages: Math.ceil(total / limit)
-            }
-        }
+    async findByWorkspaceId(workspaceId: string): Promise<Pana[]> {
+        return this.model.find({ workspaceId })
     }
 }

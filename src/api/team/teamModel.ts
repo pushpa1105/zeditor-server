@@ -1,20 +1,19 @@
-import { Document, model, Schema } from "mongoose";
+import { type Team } from "@/api/team/teamSchema";
+import { model, Schema } from "mongoose";
+import { randomUUID } from "node:crypto";
 
-export interface TeamDocument extends Document {
-    name: string;
-    ownerId: Schema.Types.ObjectId,
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-const TeamSchema = new Schema<TeamDocument>(
+const TeamSchema = new Schema<Team>(
     {
+        _id: {
+            type: String,
+            default: () => randomUUID(),
+        },
         name: {
             type: String,
             required: true,
         },
         ownerId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "User",
             required: true
         },
@@ -24,4 +23,4 @@ const TeamSchema = new Schema<TeamDocument>(
     }
 )
 
-export const TeamModel = model<TeamDocument>("Team", TeamSchema)
+export const TeamModel = model<Team>("Team", TeamSchema)

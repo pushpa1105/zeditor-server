@@ -1,7 +1,7 @@
 import { auth } from "@/common/middleware/auth";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import express, { type Router } from "express";
-import { CreatePanaSchema, PanaSchema, UpdateTitleSchema } from "./panaSchema";
+import { CreatePanaSchema, Pana, UpdateTitleSchema } from "./panaSchema";
 import { panaController } from "./panaController";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
@@ -11,7 +11,7 @@ import { PaginationQuerySchema, PaginationSchema } from "@/common/schema";
 export const panaRegistry = new OpenAPIRegistry();
 export const panaRouter: Router = express.Router();
 
-panaRegistry.register("Pana", PanaSchema)
+panaRegistry.register("Pana", Pana)
 
 panaRegistry.registerPath({
     method: "post",
@@ -24,7 +24,7 @@ panaRegistry.registerPath({
             parentId: z.string().optional()
         }),
     },
-    responses: createApiResponse(PanaSchema, "Success")
+    responses: createApiResponse(Pana, "Success")
 })
 
 panaRouter.post('/create', auth, validateRequest(CreatePanaSchema), panaController.createPana)
@@ -78,7 +78,7 @@ panaRegistry.registerPath({
         },
 
     },
-    responses: createApiResponse(PanaSchema, "Success")
+    responses: createApiResponse(Pana, "Success")
 })
 
 panaRouter.post('/:id/update-title', auth, validateRequest(UpdateTitleSchema), panaController.updateTitle)

@@ -1,13 +1,12 @@
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { SafeUser } from "@/api/user/userModel";
 import { ErrorCatcher } from "@/common/decorators/handleErrorCatcher";
 import { UserService } from "@/api/user/userService";
-import { CreateUserData, LoginUserData } from "../user/userSchema";
+import { CreateUserData, LoginUserData, User } from "../user/userSchema";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcryptjs";
 
 interface LoginUserResponse {
-    user: SafeUser;
+    user: User;
 }
 
 export class AuthService {
@@ -18,12 +17,12 @@ export class AuthService {
     }
     //Retrieves logged in user details
     @ErrorCatcher("Service.getAuthenticatedUser")
-    async getAuthenticatedUser(userId: string): Promise<ServiceResponse<SafeUser | null>> {
+    async getAuthenticatedUser(userId: string): Promise<ServiceResponse<User | null>> {
         return await this.userService.findById(userId);
     }
 
     @ErrorCatcher("Service.createUser")
-    async createUser(userData: CreateUserData): Promise<ServiceResponse<SafeUser | null>> {
+    async createUser(userData: CreateUserData): Promise<ServiceResponse<User | null>> {
         console.log('HOURRRR')
         return await this.userService.createUser(userData);
     }
