@@ -1,29 +1,27 @@
+import { Pana } from "@/api/pana/panaSchema";
 import { baseSchema } from "@/common/schema/baseSchema";
 import { Document, model, Schema } from "mongoose";
+import { randomUUID } from "node:crypto";
 
-export interface PanaDocument extends Document {
-    title: string;
-    workspaceId: Schema.Types.ObjectId;
-    parentId?: Schema.Types.ObjectId | string;
-    created_by: Schema.Types.ObjectId;
-    created_at: Date;
-}
-
-const PanaSchema = new Schema<PanaDocument>({
+const PanaSchema = new Schema<Pana>({
+    _id: {
+        type: String,
+        default: () => randomUUID()
+    },
     title: {
         type: String,
         default: 'A New Page'
     },
     workspaceId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Workspace",
         required: true,
     },
     parentId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Pana",
     },
     ...baseSchema
 })
 
-export const PanaModel = model<PanaDocument>("Pana", PanaSchema)
+export const PanaModel = model<Pana>("Pana", PanaSchema)

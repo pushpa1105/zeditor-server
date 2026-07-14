@@ -1,13 +1,11 @@
 import { AuthRequest, JwtUserData } from "@/common/middleware/auth";
 import type { RequestHandler, Response, Request } from "express";
 import { authService } from "@/api/auth/authService";
-import { CreateUserData } from "../user/userSchema";
-import { SafeUser } from "../user/userModel";
-import { attachAuthCookies, clearAuthCookies, createJti, generateAuthToken, generateRefreshToken } from "@/common/utils/token";
+import { attachAuthCookies, clearAuthCookies } from "@/common/utils/token";
 import { StatusCodes } from "http-status-codes";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { env } from "@/common/utils/envConfig";
-import { ErrorCatcher } from "@/common/decorators/handleErrorCatcher";
+import { type User } from "@/api/user/userSchema";
 
 class AuthController {
     public getCurrentUser: RequestHandler = async (req: AuthRequest, res: Response) => {
@@ -32,7 +30,7 @@ class AuthController {
             return res.status(serviceResponse.statusCode).send(serviceResponse)
         }
 
-        const user = serviceResponse.data?.user as SafeUser;
+        const user = serviceResponse.data?.user as User;
         attachAuthCookies(res, user)
 
         res.status(serviceResponse.statusCode).send(serviceResponse)
@@ -47,7 +45,7 @@ class AuthController {
 
         try {
             const payload = jwt.verify(refreshToken, env.REFRESH_SECRET) as JwtUserData
-            attachAuthCookies(res, payload as Partial<SafeUser>)
+            attachAuthCookies(res, payload as Partial<User>)
             return res.status(StatusCodes.OK).send('Cookie Refreshed.')
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send('Internal Server Error.')

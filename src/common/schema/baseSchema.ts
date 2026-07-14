@@ -10,11 +10,11 @@ export const baseSchema = {
         default: new Date(),
     },
     created_by: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Users",
     },
     updated_by: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Users",
     },
 }

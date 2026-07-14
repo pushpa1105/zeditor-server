@@ -1,32 +1,13 @@
-import { Document, model, Schema } from "mongoose";
+import { type User } from "@/api/user/userSchema";
+import { model, Schema } from "mongoose";
+import { randomUUID } from "node:crypto";
 
-type UserRole = 'admin' | 'user'
-
-export interface UserDocument extends Document {
-    name: string;
-    email: string;
-    age: number;
-    password: string;
-    role: UserRole;
-    createdAt: Date;
-    updatedAt: Date;
-    activeWorkspace?: Schema.Types.ObjectId;
-}
-
-export interface SafeUser {
-    _id: string | Object;
-    name: string;
-    password: string;
-    email: string;
-    age: number;
-    role: UserRole;
-    createdAt: Date;
-    updatedAt: Date;
-    activeWorkspace?: string;
-}
-
-const UserSchema = new Schema<UserDocument>(
+const UserSchema = new Schema<User>(
     {
+        _id: {
+            type: String,
+            default: () => randomUUID(),
+        },
         name: {
             type: String,
             required: true,
@@ -35,9 +16,6 @@ const UserSchema = new Schema<UserDocument>(
             type: String,
             required: true,
             unique: true,
-        },
-        age: {
-            type: Number,
         },
         password: {
             type: String,
@@ -49,7 +27,7 @@ const UserSchema = new Schema<UserDocument>(
             required: true,
         },
         activeWorkspace: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "Workspace",
         },
     },
@@ -65,4 +43,4 @@ const UserSchema = new Schema<UserDocument>(
     }
 )
 
-export const UserModel = model<UserDocument>("User", UserSchema)
+export const UserModel = model<User>("User", UserSchema)

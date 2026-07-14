@@ -1,8 +1,7 @@
-import { ObjectIdSchema } from "@/common/schema";
 import z from "zod";
 
 export type CreatePanaData = z.infer<typeof CreatePanaSchema.shape.body>;
-export type PanaData = z.infer<typeof PanaSchema>;
+export type Pana = z.infer<typeof Pana>;
 
 export const CreatePanaSchema = z.object({
     body: z.object({
@@ -16,8 +15,11 @@ export const UpdateTitleSchema = z.object({
     })
 })
 
-export const PanaSchema = z.object({
-    id: z.number(),
+export const Pana = z.object({
+    _id: z.string(),
     title: z.string(),
-    workspaceId: z.string()
+    workspaceId: z.string(),
+    parentId: z.string().nullable(),
+    created_by: z.string(),
+    created_at: z.date(),
 })

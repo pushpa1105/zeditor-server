@@ -1,22 +1,13 @@
-import { Document, model, Schema } from "mongoose";
+import { Workspace, WORKSPACE_TYPES } from "@/api/workspace/workspaceSchema";
+import { model, Schema } from "mongoose";
+import { randomUUID } from "node:crypto";
 
-export const WORKSPACE_TYPES = {
-    PERSONAL: "personal",
-    TEAM: "team",
-} as const;
-
-export type WorkspaceType =
-    (typeof WORKSPACE_TYPES)[keyof typeof WORKSPACE_TYPES];
-
-export interface WorkspaceDocument extends Document {
-    name: string;
-    type: WorkspaceType;
-    ownerId: Schema.Types.ObjectId;
-    teamId?: string;
-}
-
-const WorkspaceSchema = new Schema<WorkspaceDocument>(
+const WorkspaceSchema = new Schema<Workspace>(
     {
+        _id: {
+            type: String,
+            default: () => randomUUID()
+        },
         name: {
             type: String,
             required: true,
@@ -25,15 +16,15 @@ const WorkspaceSchema = new Schema<WorkspaceDocument>(
             type: String,
             enum: Object.values(WORKSPACE_TYPES),
             required: true,
-            default: WORKSPACE_TYPES.PERSONAL,
+            default: WORKSPACE_TYPES.personal,
         },
         ownerId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "User",
             required: true
         },
         teamId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "Team",
         },
     },
@@ -46,7 +37,7 @@ WorkspaceSchema.index(
     { name: 1, ownerId: 1 },
     {
         unique: true,
-        partialFilterExpression: { type: WORKSPACE_TYPES.PERSONAL }
+        partialFilterExpression: { type: WORKSPACE_TYPES.personal }
     }
 );
 
@@ -54,8 +45,8 @@ WorkspaceSchema.index(
     { name: 1, teamId: 1 },
     {
         unique: true,
-        partialFilterExpression: { type: WORKSPACE_TYPES.TEAM }
+        partialFilterExpression: { type: WORKSPACE_TYPES.team }
     }
 )
 
-export const WorkspaceModel = model<WorkspaceDocument>("Workspace", WorkspaceSchema)
+export const WorkspaceModel = model<Workspace>("Workspace", WorkspaceSchema)

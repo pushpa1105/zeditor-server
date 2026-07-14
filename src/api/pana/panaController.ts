@@ -1,7 +1,6 @@
 import { AuthRequest } from "@/common/middleware/auth";
 import { RequestHandler, Response } from "express";
 import { panaService } from "./panaService";
-import { buildPagination } from "@/common/utils/pagination";
 import { StatusCodes } from "http-status-codes";
 
 export class PanaController {
@@ -16,6 +15,8 @@ export class PanaController {
             parentId,
         }
 
+        console.log('OPPPPP', req.userData)
+
         const serviceResponse = await panaService.createPana(panaData)
 
         res.status(serviceResponse.statusCode).send(serviceResponse)
@@ -27,9 +28,6 @@ export class PanaController {
     }
 
     public updateTitle: RequestHandler = async (req: AuthRequest, res: Response) => {
-        console.log('MMEMMEMEMEMEM')
-        console.log(req.params.id)
-        console.log('ABBBB', req.body)
         const serviceResponse = await panaService.updatePanaById(req.params.id, {
             title: req.body.title
         })
@@ -38,17 +36,10 @@ export class PanaController {
 
     public getActiveWorkspacePanas: RequestHandler = async (req: AuthRequest, res: Response) => {
         const { activeWorkspace, _id } = req.userData || {}
-        const { parentId } = req.query || {}
-
-        const pagination = buildPagination(req.query)
 
         if (!activeWorkspace) return res.status(StatusCodes.NOT_FOUND).send({ message: 'User does not have active workspace' })
 
-        const serviceResponse = await panaService.getActiveWorkspacePanas({
-            pagination,
-            workspaceId: activeWorkspace,
-            parentId: parentId as string | undefined
-        })
+        const serviceResponse = await panaService.getActiveWorkspacePanas(activeWorkspace)
 
         res.status(serviceResponse.statusCode).send(serviceResponse)
     }

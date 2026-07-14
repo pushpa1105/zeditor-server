@@ -1,14 +1,15 @@
-import { TeamDocument, TeamModel } from "./teamModel";
-import { CreateTeamData } from "./teamSchema";
+import { BaseRepository } from "@/common/repository/baseRepository";
+import { TeamModel } from "./teamModel";
+import { Team } from "./teamSchema";
+import { AsyncLocalStorageCurrentUser } from "@/common/context/requestContext";
 
-export class TeamRepository {
-    async createTeam(teamData: CreateTeamData & {
-        ownerId: string;
-    }): Promise<TeamDocument | null> {
-        return await TeamModel.insertOne(teamData) || null
+export class TeamRepository extends BaseRepository<Team> {
+
+    constructor(model = TeamModel, currentUser = new AsyncLocalStorageCurrentUser()) {
+        super(model, currentUser)
     }
 
-    async findByName(name: string): Promise<TeamDocument | null> {
+    async findByName(name: string): Promise<Team | null> {
         return await TeamModel.findOne({ name }) || null
     }
 }

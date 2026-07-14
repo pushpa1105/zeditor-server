@@ -1,12 +1,11 @@
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { WorkspaceRepository } from "./workspaceRepository";
-import { CreateWorkspaceData, GetMyWorkspace } from "./workspaceSchema";
-import { WORKSPACE_TYPES, WorkspaceDocument } from "./workspaceModel";
+import { WORKSPACE_TYPES, type CreateWorkspaceData, type GetMyWorkspace, type Workspace } from "./workspaceSchema";
 import { StatusCodes } from "http-status-codes";
 import { ErrorCatcher } from "@/common/decorators/handleErrorCatcher";
-import { SafeUser } from "../user/userModel";
 import { DocumentWithMetaData } from "@/common/schema";
 import { userService } from "../user/userService";
+import type { User } from "@/api/user/userSchema";
 
 export class WorkspaceService {
     private workspaceRepository: WorkspaceRepository
@@ -16,7 +15,7 @@ export class WorkspaceService {
     }
 
     @ErrorCatcher("WorkspaceService.getWorkspaceById")
-    async getWorkspaceById(workspaceId: string): Promise<ServiceResponse<WorkspaceDocument | null>> {
+    async getWorkspaceById(workspaceId: string): Promise<ServiceResponse<Workspace | null>> {
         const workspace = await this.workspaceRepository.findById(workspaceId)
 
         return ServiceResponse.success('Workspace fetched successfully', workspace)
@@ -26,7 +25,7 @@ export class WorkspaceService {
     async createWorkspace(workspaceData: CreateWorkspaceData & {
         ownerId: string;
         teamId?: string;
-    }): Promise<ServiceResponse<WorkspaceDocument | null>> {
+    }): Promise<ServiceResponse<Workspace | null>> {
         const { name, ownerId, teamId } = workspaceData
         const checkWorkspace = await this.workspaceRepository.findByNameAndScope({
             name,
@@ -38,7 +37,7 @@ export class WorkspaceService {
             return ServiceResponse.failure(`Workspace with name "${name}" already exists.`, null, StatusCodes.CONFLICT)
         }
 
-        const workspace = await this.workspaceRepository.createWorkspace(workspaceData);
+        const workspace = await this.workspaceRepository.createOne(workspaceData);
 
         await userService.setActiveWorkspace(ownerId, workspace?.id!)
 
@@ -46,23 +45,23 @@ export class WorkspaceService {
     }
 
     @ErrorCatcher("WorkspaceService.createDefaultWorkspace")
-    async createDefaultWorkspace(user: Partial<SafeUser>): Promise<ServiceResponse<WorkspaceDocument | null>> {
+    async createDefaultWorkspace(user: Partial<User>): Promise<ServiceResponse<Workspace | null>> {
         const { _id, name } = user
 
         const workspaceData = {
             name: `${name}'s Workspace`,
             ownerId: _id as string,
-            type: WORKSPACE_TYPES.PERSONAL
+            type: WORKSPACE_TYPES.personal
         }
 
 
-        const workspace = await this.workspaceRepository.createWorkspace(workspaceData);
+        const workspace = await this.workspaceRepository.createOne(workspaceData);
 
         return ServiceResponse.success('Workspace created successfully', workspace)
     }
 
     @ErrorCatcher("WorkspaceService.getMyWorkspaces")
-    async getMyWorkspaces({ pagination, userId }: GetMyWorkspace): Promise<ServiceResponse<DocumentWithMetaData<WorkspaceDocument[]>>> {
+    async getMyWorkspaces({ pagination, userId }: GetMyWorkspace): Promise<ServiceResponse<DocumentWithMetaData<Workspace[]>>> {
 
         const filters = {
             ownerId: userId

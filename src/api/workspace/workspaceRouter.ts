@@ -1,6 +1,6 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
-import { CreateWorkspaceSchema, WorkspaceSchema } from "./workspaceSchema";
+import { CreateWorkspaceSchema, Workspace } from "./workspaceSchema";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { workspaceController } from "./workspaceController";
@@ -10,7 +10,7 @@ import z from "zod";
 export const workspaceRegistry = new OpenAPIRegistry();
 export const workspaceRouter: Router = express.Router();
 
-workspaceRegistry.register("Workspace", WorkspaceSchema)
+workspaceRegistry.register("Workspace", Workspace)
 
 workspaceRegistry.registerPath({
     method: "post",
@@ -18,7 +18,7 @@ workspaceRegistry.registerPath({
     tags: ["Workspace"],
     security: [{ cookieAuth: [] }],
     request: { body: { content: { "application/json": { schema: CreateWorkspaceSchema.shape.body } } } },
-    responses: createApiResponse(WorkspaceSchema, "Success")
+    responses: createApiResponse(Workspace, "Success")
 })
 
 workspaceRouter.post("/create", auth, validateRequest(CreateWorkspaceSchema), workspaceController.createWorkspace)
@@ -28,7 +28,7 @@ workspaceRegistry.registerPath({
     path: "/workspaces/my",
     tags: ["Workspace"],
     security: [{ cookieAuth: [] }],
-    responses: createApiResponse(z.array(WorkspaceSchema), "Success")
+    responses: createApiResponse(z.array(Workspace), "Success")
 })
 
 workspaceRouter.get("/my", auth, workspaceController.getMyWorkspaces)

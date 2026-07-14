@@ -1,26 +1,14 @@
-import { Types } from "mongoose";
-import { SafeUser, UserModel } from "./userModel";
-import { CreateUserData } from "./userSchema";
+import { AsyncLocalStorageCurrentUser } from "@/common/context/requestContext";
+import { UserModel } from "./userModel";
+import { type User } from "./userSchema";
+import { BaseRepository } from "@/common/repository/baseRepository";
 
-export class UserRepository {
-	async findAllAsync(): Promise<SafeUser[]> {
-		return await UserModel.find({});
+export class UserRepository extends BaseRepository<User> {
+	constructor(model = UserModel, currentUser = new AsyncLocalStorageCurrentUser()) {
+		super(model, currentUser)
 	}
 
-	async findByIdAsync(id: string): Promise<SafeUser | null> {
-		return await UserModel.findById(id) || null;
-	}
-
-
-	async findByEmailAsync(email: string): Promise<SafeUser | null> {
+	async findByEmail(email: string): Promise<User | null> {
 		return await UserModel.findOne({ email }) || null;
-	}
-
-	async createUser(userData: CreateUserData): Promise<SafeUser | null> {
-		return await UserModel.insertOne(userData) || null;
-	}
-
-	async updateUser(id: string, updatedUserData: Partial<SafeUser>): Promise<SafeUser> {
-		return await UserModel.findByIdAndUpdate(id, updatedUserData, { new: true }) as SafeUser;
 	}
 }

@@ -1,7 +1,6 @@
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { TeamDocument } from "./teamModel";
 import { TeamRepository } from "./teamRepository";
-import { CreateTeamData } from "./teamSchema";
+import { CreateTeamData, type Team } from "./teamSchema";
 import { StatusCodes } from "http-status-codes";
 import { ErrorCatcher } from "@/common/decorators/handleErrorCatcher";
 
@@ -13,16 +12,16 @@ export class TeamService {
     }
 
     @ErrorCatcher("Service.createTeam")
-    async createTeam(teamData: CreateTeamData & { ownerId: string }): Promise<ServiceResponse<TeamDocument | null>> {
+    async createTeam(teamData: CreateTeamData & { ownerId: string }): Promise<ServiceResponse<Team | null>> {
         const checkTeamName = await this.teamRepository.findByName(teamData?.name)
 
         if (checkTeamName) {
             return ServiceResponse.failure(`Team with name "${teamData?.name}" already exists`, null, StatusCodes.CONFLICT)
         }
 
-        const team = await this.teamRepository.createTeam(teamData)
+        const team = await this.teamRepository.createOne(teamData)
 
-        return ServiceResponse.success<TeamDocument | null>("Team created successfully", team)
+        return ServiceResponse.success<Team | null>("Team created successfully", team)
     }
 }
 

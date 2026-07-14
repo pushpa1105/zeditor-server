@@ -6,6 +6,7 @@ import { authRegistry } from "@/api/auth/authRouter";
 import { teamRegistry } from "@/api/team/teamRouter";
 import { workspaceRegistry } from "@/api/workspace/workspaceRouter";
 import { panaRegistry } from "@/api/pana/panaRouter";
+import { blockRegistry } from "@/api/block/blockRouter";
 
 export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>;
 
@@ -17,7 +18,8 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
 			authRegistry,
 			teamRegistry,
 			workspaceRegistry,
-			panaRegistry
+			panaRegistry,
+			blockRegistry
 			/**
 			 * Add registry above this comment.
 			 */

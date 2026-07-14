@@ -1,7 +1,7 @@
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
-import { CreateUserSchema, LoginResponseSchema, LoginUserSchema, UserSchema } from "@/api/user/userSchema";
+import { CreateUserSchema, LoginResponseSchema, LoginUserSchema, User } from "@/api/user/userSchema";
 import { auth } from "@/common/middleware/auth";
 import { authController } from "@/api/auth/authController";
 import { validateRequest } from "@/common/utils/httpHandlers";
@@ -15,7 +15,7 @@ authRegistry.registerPath({
     path: "/whoami",
     tags: ["Auth"],
     security: [{ cookieAuth: [] }],
-    responses: createApiResponse(UserSchema, "Success")
+    responses: createApiResponse(User, "Success")
 })
 
 authRouter.get("/whoami", auth, authController.getCurrentUser);
@@ -25,7 +25,7 @@ authRegistry.registerPath({
     path: "/register",
     tags: ["Auth"],
     request: { body: { content: { "application/json": { schema: CreateUserSchema.shape.body } } } },
-    responses: createApiResponse(UserSchema, "Success"),
+    responses: createApiResponse(User, "Success"),
 })
 
 authRouter.post("/register", validateRequest(CreateUserSchema), authController.createUser)

@@ -1,17 +1,12 @@
-import { DocumentWithMetaData, MetaData, WithPagination } from "@/common/schema";
-import { WorkspaceDocument, WorkspaceModel } from "./workspaceModel";
-import { CreateWorkspaceData } from "./workspaceSchema";
+import { DocumentWithMetaData, WithPagination } from "@/common/schema";
+import { WorkspaceModel } from "./workspaceModel";
+import { type Workspace } from "./workspaceSchema";
+import { BaseRepository } from "@/common/repository/baseRepository";
+import { AsyncLocalStorageCurrentUser } from "@/common/context/requestContext";
 
-export class WorkspaceRepository {
-    async createWorkspace(workspaceData: CreateWorkspaceData & {
-        ownerId: string;
-        teamId?: string;
-    }): Promise<WorkspaceDocument | null> {
-        return await WorkspaceModel.insertOne(workspaceData)
-    }
-
-    async findById(id: string): Promise<WorkspaceDocument | null> {
-        return await WorkspaceModel.findById(id)
+export class WorkspaceRepository extends BaseRepository<Workspace> {
+    constructor(model = WorkspaceModel, currentUser = new AsyncLocalStorageCurrentUser()) {
+        super(model, currentUser)
     }
 
     async findByNameAndScope({
@@ -22,7 +17,7 @@ export class WorkspaceRepository {
         name: string,
         ownerId?: string;
         teamId?: string;
-    }): Promise<WorkspaceDocument | null> {
+    }): Promise<Workspace | null> {
         return await WorkspaceModel.findOne({
             name,
             ...(ownerId && { ownerId }),
@@ -33,7 +28,7 @@ export class WorkspaceRepository {
     async findWithPagination({
         pagination,
         filters
-    }: WithPagination): Promise<DocumentWithMetaData<WorkspaceDocument[]>> {
+    }: WithPagination): Promise<DocumentWithMetaData<Workspace[]>> {
         const { skip, limit, sort } = pagination
 
         const query = { ...filters }
@@ -42,7 +37,7 @@ export class WorkspaceRepository {
             WorkspaceModel.find(query)
                 .sort(sort)
                 .skip(skip)
-                .limit(limit),
+                .limit(limit!),
             WorkspaceModel.countDocuments(query)
         ])
 
@@ -52,7 +47,7 @@ export class WorkspaceRepository {
                 total,
                 page: pagination?.page || 1,
                 limit: limit || 10,
-                totalPages: Math.ceil(total / limit)
+                totalPages: Math.ceil(total / limit!)
             }
         }
     }
