@@ -58,7 +58,7 @@ export class PanaService {
     async getActiveWorkspacePanas(workspaceId: string): Promise<ServiceResponse<Pana[] | null>> {
         const panas = await this.panaRepository.findByWorkspaceId(workspaceId)
 
-        return ServiceResponse.success('Panas for active workspace fetched successfully', panas)
+        return ServiceResponse.success('Panas for workspace fetched successfully', panas)
     }
 }
 
