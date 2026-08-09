@@ -32,3 +32,18 @@ workspaceRegistry.registerPath({
 })
 
 workspaceRouter.get("/my", auth, workspaceController.getMyWorkspaces)
+
+workspaceRegistry.registerPath({
+    method: "get",
+    path: "/workspaces/{workspaceId}/panas",
+    tags: ['Workspace'],
+    security: [{ cookieAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.string()
+        })
+    },
+    responses: createApiResponse(z.null(), "Success")
+})
+
+workspaceRouter.get('/:workspaceId/panas', auth, workspaceController.getPanasByWorkspace)

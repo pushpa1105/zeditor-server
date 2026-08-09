@@ -45,22 +45,6 @@ panaRegistry.registerPath({
 panaRouter.delete('/:id', auth, panaController.deletePanaById)
 
 panaRegistry.registerPath({
-    method: "get",
-    path: "/panas/current-workspace",
-    tags: ['Pana'],
-    security: [{ cookieAuth: [] }],
-    request: {
-        query: z.object({
-            parentId: z.string().optional(),
-            ...PaginationQuerySchema.shape
-        }),
-    },
-    responses: createApiResponse(z.null(), "Success")
-})
-
-panaRouter.get('/current-workspace', auth, panaController.getActiveWorkspacePanas)
-
-panaRegistry.registerPath({
     method: "post",
     path: "/panas/{id}/update-title",
     tags: ['Pana'],

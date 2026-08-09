@@ -2,6 +2,8 @@ import { AuthRequest } from "@/common/middleware/auth";
 import { RequestHandler, Response } from "express";
 import { workspaceService } from "./workspaceService";
 import { buildPagination } from "@/common/utils/pagination";
+import { StatusCodes } from "http-status-codes";
+import { panaService } from "@/api/pana/panaService";
 
 export class WorkspaceController {
     public createWorkspace: RequestHandler = async (req: AuthRequest, res: Response) => {
@@ -26,6 +28,16 @@ export class WorkspaceController {
             pagination,
             userId: req?.userData?._id!
         })
+
+        res.status(serviceResponse.statusCode).send(serviceResponse)
+    }
+
+    public getPanasByWorkspace: RequestHandler = async (req: AuthRequest, res: Response) => {
+        const workspaceId = req.params.workspaceId
+
+        if (!workspaceId) return res.status(StatusCodes.NOT_FOUND).send({ message: 'User does not have active workspace' })
+
+        const serviceResponse = await panaService.getActiveWorkspacePanas(workspaceId)
 
         res.status(serviceResponse.statusCode).send(serviceResponse)
     }
