@@ -9,12 +9,6 @@ export const CreatePanaSchema = z.object({
     }).optional()
 })
 
-export const UpdateTitleSchema = z.object({
-    body: z.object({
-        title: z.string().min(1, "Required"),
-    })
-})
-
 export const Pana = z.object({
     _id: z.string(),
     title: z.string(),
@@ -22,4 +16,11 @@ export const Pana = z.object({
     parentId: z.string().nullable(),
     created_by: z.string(),
     created_at: z.date(),
+})
+
+export const UpdatePanaSchema = z.object({
+    body: Pana.pick({
+        title: true,
+        parentId: true,
+    }).partial()
 })

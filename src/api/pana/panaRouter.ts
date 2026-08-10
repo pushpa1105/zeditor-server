@@ -1,12 +1,11 @@
 import { auth } from "@/common/middleware/auth";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import express, { type Router } from "express";
-import { CreatePanaSchema, Pana, UpdateTitleSchema } from "./panaSchema";
+import { CreatePanaSchema, Pana, UpdatePanaSchema } from "./panaSchema";
 import { panaController } from "./panaController";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
-import z, { any } from "zod";
-import { PaginationQuerySchema, PaginationSchema } from "@/common/schema";
+import z from "zod";
 
 export const panaRegistry = new OpenAPIRegistry();
 export const panaRouter: Router = express.Router();
@@ -45,8 +44,8 @@ panaRegistry.registerPath({
 panaRouter.delete('/:id', auth, panaController.deletePanaById)
 
 panaRegistry.registerPath({
-    method: "post",
-    path: "/panas/{id}/update-title",
+    method: "patch",
+    path: "/panas/{id}",
     tags: ['Pana'],
     security: [{ cookieAuth: [] }],
     request: {
@@ -56,7 +55,7 @@ panaRegistry.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: UpdateTitleSchema.shape.body
+                    schema: UpdatePanaSchema.shape.body
                 }
             }
         },
@@ -65,4 +64,4 @@ panaRegistry.registerPath({
     responses: createApiResponse(Pana, "Success")
 })
 
-panaRouter.post('/:id/update-title', auth, validateRequest(UpdateTitleSchema), panaController.updateTitle)
+panaRouter.patch('/:id', auth, validateRequest(UpdatePanaSchema), panaController.updatePana)

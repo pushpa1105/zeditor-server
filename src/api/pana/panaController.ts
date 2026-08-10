@@ -2,6 +2,7 @@ import { AuthRequest } from "@/common/middleware/auth";
 import { RequestHandler, Response } from "express";
 import { panaService } from "./panaService";
 import { StatusCodes } from "http-status-codes";
+import { sanitizeObject } from "@/common/utils/sanitizeObject";
 
 export class PanaController {
     public createPana: RequestHandler = async (req: AuthRequest, res: Response) => {
@@ -15,8 +16,6 @@ export class PanaController {
             parentId,
         }
 
-        console.log('OPPPPP', req.userData)
-
         const serviceResponse = await panaService.createPana(panaData)
 
         res.status(serviceResponse.statusCode).send(serviceResponse)
@@ -27,10 +26,12 @@ export class PanaController {
         res.status(serviceResponse.statusCode).send(serviceResponse)
     }
 
-    public updateTitle: RequestHandler = async (req: AuthRequest, res: Response) => {
-        const serviceResponse = await panaService.updatePanaById(req.params.id, {
-            title: req.body.title
-        })
+    public updatePana: RequestHandler = async (req: AuthRequest, res: Response) => {
+        const { title, parentId } = req?.body || {}
+        const serviceResponse = await panaService.updatePanaById(req.params.id, sanitizeObject({
+            title,
+            parentId,
+        }))
         res.status(serviceResponse.statusCode).send(serviceResponse)
     }
 
