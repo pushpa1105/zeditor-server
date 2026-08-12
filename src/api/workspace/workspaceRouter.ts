@@ -6,6 +6,7 @@ import { validateRequest } from "@/common/utils/httpHandlers";
 import { workspaceController } from "./workspaceController";
 import { auth } from "@/common/middleware/auth";
 import z from "zod";
+import { checkWorkspace } from "@/common/middleware/checkWorkspace";
 
 export const workspaceRegistry = new OpenAPIRegistry();
 export const workspaceRouter: Router = express.Router();
@@ -46,4 +47,8 @@ workspaceRegistry.registerPath({
     responses: createApiResponse(z.null(), "Success")
 })
 
-workspaceRouter.get('/:workspaceId/panas', auth, workspaceController.getPanasByWorkspace)
+workspaceRouter.get('/:workspaceId/panas',
+    auth,
+    checkWorkspace({ checkOwnerShip: true, source: 'params', key: 'workspaceId' }),
+    workspaceController.getPanasByWorkspace
+)

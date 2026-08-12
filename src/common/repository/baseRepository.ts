@@ -24,7 +24,7 @@ export abstract class BaseRepository<T> {
         return await this.model.find({})
     }
 
-    async findById(id: string) {
+    async findById(id: string): Promise<T> {
         return await this.model.findOne({ _id: id })
     }
 
