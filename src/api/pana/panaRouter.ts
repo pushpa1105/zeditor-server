@@ -6,6 +6,8 @@ import { panaController } from "./panaController";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import z from "zod";
+import { checkWorkspace } from "@/common/middleware/checkWorkspace";
+import { checkPana } from "@/common/middleware/checkPana";
 
 export const panaRegistry = new OpenAPIRegistry();
 export const panaRouter: Router = express.Router();
@@ -26,7 +28,12 @@ panaRegistry.registerPath({
     responses: createApiResponse(Pana, "Success")
 })
 
-panaRouter.post('/create', auth, validateRequest(CreatePanaSchema), panaController.createPana)
+panaRouter.post('/create',
+    auth,
+    validateRequest(CreatePanaSchema),
+    checkWorkspace({ checkOwnerShip: true, source: 'cookie', key: 'parentId' }),
+    panaController.createPana
+)
 
 panaRegistry.registerPath({
     method: "delete",
@@ -41,7 +48,11 @@ panaRegistry.registerPath({
     responses: createApiResponse(z.null(), "Success")
 })
 
-panaRouter.delete('/:id', auth, panaController.deletePanaById)
+panaRouter.delete('/:id',
+    auth,
+    checkPana({ checkOwnership: true }),
+    panaController.deletePanaById
+)
 
 panaRegistry.registerPath({
     method: "patch",
@@ -64,4 +75,9 @@ panaRegistry.registerPath({
     responses: createApiResponse(Pana, "Success")
 })
 
-panaRouter.patch('/:id', auth, validateRequest(UpdatePanaSchema), panaController.updatePana)
+panaRouter.patch('/:id',
+    auth,
+    checkPana({ checkOwnership: true }),
+    validateRequest(UpdatePanaSchema),
+    panaController.updatePana
+)

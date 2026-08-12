@@ -5,23 +5,34 @@ export class ServiceResponse<T = null> {
 	readonly success: boolean;
 	readonly message: string;
 	readonly data: T;
+	readonly errors: ValidationErrors;
 	readonly statusCode: number;
 
-	private constructor(success: boolean, message: string, data: T, statusCode: number) {
+	private constructor(success: boolean, message: string, data: T, statusCode: number, errors: ValidationErrors) {
 		this.success = success;
 		this.message = message;
 		this.data = data;
+		this.errors = errors;
 		this.statusCode = statusCode;
 	}
 
 	static success<T>(message: string, data: T, statusCode: number = StatusCodes.OK) {
-		return new ServiceResponse(true, message, data, statusCode);
+		return new ServiceResponse(true, message, data, statusCode, null);
 	}
 
-	static failure<T>(message: string, data: T, statusCode: number = StatusCodes.BAD_REQUEST) {
-		return new ServiceResponse(false, message, data, statusCode);
+	static failure<T>(message: string, data: T, statusCode: number, errors: ValidationErrors = []) {
+		return new ServiceResponse(false, message, data, statusCode, errors);
 	}
 }
+
+const ValidationErrorsSchema = z.array(
+	z.object({
+		field: z.string(),
+		message: z.string(),
+	})
+).nullable()
+
+type ValidationErrors = z.infer<typeof ValidationErrorsSchema>
 
 export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 	z.object({
@@ -29,4 +40,5 @@ export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 		message: z.string(),
 		data: dataSchema.optional(),
 		statusCode: z.number(),
+		errors: dataSchema.optional(),
 	});

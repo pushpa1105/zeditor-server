@@ -1,0 +1,1 @@
+export type RequestIdSource = 'params' | 'body' | 'query' | 'cookie'
